@@ -12,9 +12,10 @@ export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isGptOpen, setIsGptOpen] = useState(false);
+  const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
 
   useEffect(() => {
-    const root = window.document.documentElement;
+    const root = document.documentElement;
     root.classList.remove("light", "system");
     root.classList.add("dark");
   }, []);
@@ -40,6 +41,23 @@ export default function Home() {
     }
   };
 
+  const sendMessage = async () => {
+    const input = (document.getElementById("nexura-gpt-input") as HTMLInputElement).value;
+    if (!input) return;
+
+    setMessages(prev => [...prev, { role: "user", content: input }]);
+    (document.getElementById("nexura-gpt-input") as HTMLInputElement).value = "";
+
+    const res = await fetch("/api/gpt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: input }),
+    });
+
+    const data = await res.json();
+    setMessages(prev => [...prev, { role: "assistant", content: data.result }]);
+  };
+
   return (
     <div className="min-h-screen w-full relative bg-black overflow-x-hidden">
       {/* Background floating elements */}
@@ -54,7 +72,7 @@ export default function Home() {
             background:
               "radial-gradient(ellipse 50% 35% at 50% 0%, rgba(0,212,255,0.08), transparent 60%), #000",
           }}
-        />
+        ></div>
       </div>
 
       {/* Desktop Header */}
@@ -67,7 +85,7 @@ export default function Home() {
           <div className="text-primary font-bold text-2xl neon-text">NEXURA</div>
         </a>
         <div className="absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-muted-foreground md:flex md:space-x-2">
-          {navItems.map((item) => (
+          {navItems.map(item => (
             <a
               key={item.id}
               className="relative px-4 py-2 text-muted-foreground hover:text-primary cursor-pointer"
@@ -98,20 +116,12 @@ export default function Home() {
         >
           <div className="flex flex-col items-center justify-center w-5 h-5 space-y-1">
             <span
-              className={`block w-4 h-0.5 bg-primary transition-all duration-300 ${
-                isMobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
-              }`}
-            />
+              className={`${isMobileMenuOpen ? "rotate-45 translate-y-1.5" : ""} block w-4 h-0.5 bg-primary`}
+            ></span>
+            <span className={`${isMobileMenuOpen ? "opacity-0" : ""} block w-4 h-0.5 bg-primary`}></span>
             <span
-              className={`block w-4 h-0.5 bg-primary transition-all duration-300 ${
-                isMobileMenuOpen ? "opacity-0" : ""
-              }`}
-            />
-            <span
-              className={`block w-4 h-0.5 bg-primary transition-all duration-300 ${
-                isMobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
-              }`}
-            />
+              className={`${isMobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""} block w-4 h-0.5 bg-primary`}
+            ></span>
           </div>
         </button>
       </header>
@@ -120,7 +130,7 @@ export default function Home() {
         <div className="fixed inset-0 z-[99998] bg-black/50 backdrop-blur-sm md:hidden">
           <div className="absolute top-20 left-4 right-4 bg-background/95 backdrop-blur-md neon-border rounded-2xl shadow-2xl p-6">
             <nav className="flex flex-col space-y-4">
-              {navItems.map((item) => (
+              {navItems.map(item => (
                 <button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
@@ -143,8 +153,8 @@ export default function Home() {
       {/* Hero Section */}
       <Hero />
 
-      {/* ===== Nexura GPT Button ===== */}
-      <div className="flex justify-center mt-6 relative z-[99999] animate-bounce">
+      {/* GPT Button */}
+      <div className="flex justify-center mt-6 z-50 relative">
         <button
           onClick={() => setIsGptOpen(true)}
           className="px-8 py-3 rounded-full bg-cyan-400 text-black font-bold text-lg shadow-neon hover:shadow-neon-lg transition-all duration-300 flex items-center gap-2"
@@ -153,20 +163,21 @@ export default function Home() {
         </button>
       </div>
 
-      {/* ===== Nexura GPT Popup ===== */}
+      {/* GPT Popup */}
       {isGptOpen && (
-        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-black border-2 border-cyan-400 rounded-xl shadow-neon flex flex-col z-[99999]">
+        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-black border-2 border-cyan-400 rounded-xl shadow-neon flex flex-col z-50">
           <div className="bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-bold p-3 rounded-t-xl flex justify-between items-center">
             🌐 NEXURA GPT
-            <button
-              onClick={() => setIsGptOpen(false)}
-              className="text-black font-bold hover:text-white"
-            >
+            <button onClick={() => setIsGptOpen(false)} className="text-black font-bold hover:text-white">
               ✖
             </button>
           </div>
           <div id="nexura-gpt-messages" className="flex-1 p-3 overflow-y-auto text-white">
-            Hello! How can I help you?
+            {messages.map((m, i) => (
+              <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
+                {m.content}
+              </div>
+            ))}
           </div>
           <div className="flex p-3 gap-2">
             <input
@@ -175,7 +186,7 @@ export default function Home() {
               placeholder="Type your question..."
               className="flex-1 p-2 rounded-lg bg-gray-900 text-white outline-none"
             />
-            <button className="bg-cyan-400 px-4 py-2 rounded-lg font-bold text-black">
+            <button onClick={sendMessage} className="bg-cyan-400 px-4 py-2 rounded-lg font-bold text-black">
               Send
             </button>
           </div>
@@ -183,20 +194,12 @@ export default function Home() {
       )}
 
       {/* Sections */}
-      <div id="about">
-        <AboutUs />
-      </div>
-      <div id="services">
-        <Services />
-      </div>
-      <div id="team">
-        <Team />
-      </div>
-      <div id="contact">
-        <Contact />
-      </div>
+      <div id="about"><AboutUs /></div>
+      <div id="services"><Services /></div>
+      <div id="team"><Team /></div>
+      <div id="contact"><Contact /></div>
 
-      {/* WhatsApp Button */}
+      {/* WhatsApp */}
       <div className="fixed bottom-6 right-6 z-[9999]">
         <Link
           href="https://wa.me/13862910027?text=Hello%20I%20want%20to%20know%20more%20about%20your%20marketplace%20services!"
@@ -209,5 +212,6 @@ export default function Home() {
     </div>
   );
 }
+
 
 
