@@ -80,12 +80,9 @@ export default function Home() {
           isScrolled ? "max-w-4xl px-2" : "max-w-6xl px-4"
         } py-2 left-1/2 transform -translate-x-1/2`}
       >
-        {/* Logo */}
         <a className="flex items-center gap-2" href="#">
           <div className="text-primary font-bold text-2xl neon-text">NEXURA</div>
         </a>
-
-        {/* Nav Items */}
         <div className="hidden md:flex flex-1 justify-center space-x-6 text-sm font-medium text-muted-foreground">
           {navItems.map(item => (
             <a
@@ -97,8 +94,6 @@ export default function Home() {
             </a>
           ))}
         </div>
-
-        {/* Contact Us */}
         <div className="flex items-center">
           <button
             onClick={() => scrollToSection("contact")}
@@ -111,7 +106,6 @@ export default function Home() {
 
       {/* Mobile Header */}
       <header className="fixed top-4 z-[99999] left-4 right-4 flex items-center justify-between md:hidden px-4 py-3 bg-background/80 backdrop-blur-sm neon-border shadow-lg rounded-full">
-        {/* Logo */}
         <a href="#" className="flex items-center justify-center gap-2">
           <div className="text-primary font-bold text-xl neon-text">NEXURA</div>
         </a>
@@ -141,7 +135,6 @@ export default function Home() {
         </button>
       </header>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-[99998] bg-black/50 backdrop-blur-sm md:hidden">
           <div className="absolute top-20 left-4 right-4 bg-background/95 backdrop-blur-md neon-border rounded-2xl shadow-2xl p-6">
@@ -167,9 +160,9 @@ export default function Home() {
       <div className="flex justify-center mt-6 z-50 relative">
         <button
           onClick={() => setIsGptOpen(true)}
-          className="px-8 py-3 rounded-full bg-cyan-400 text-black font-bold text-lg shadow-neon hover:shadow-neon-lg transition-all duration-300 flex items-center gap-2"
+          className="px-8 py-3 rounded-full bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 text-black font-extrabold text-lg shadow-neon animate-bounce hover:scale-105 hover:shadow-neon-lg transition-all duration-300 flex items-center gap-2"
         >
-          ✨ ASK NEXURA GPT
+          ✨ <span className="text-white font-bold tracking-wide">ASK NEXURA GPT</span>
         </button>
       </div>
 
