@@ -74,36 +74,41 @@ export default function Home() {
           }}
         ></div>
       </div>
+{/* Desktop Header */}
+<header
+  className={`fixed top-4 z-[99999] mx-auto hidden w-full md:flex items-center justify-between backdrop-blur-sm neon-border shadow-lg transition-all duration-300 ${
+    isScrolled ? "max-w-4xl px-2" : "max-w-6xl px-4"
+  } py-2 left-1/2 transform -translate-x-1/2`}
+>
+  {/* Logo - Left */}
+  <a className="flex items-center gap-2" href="#">
+    <div className="text-primary font-bold text-2xl neon-text">NEXURA</div>
+  </a>
 
-      {/* Desktop Header */}
-      <header
-        className={`fixed top-4 z-[99999] mx-auto hidden w-full md:flex backdrop-blur-sm neon-border shadow-lg transition-all duration-300 ${
-          isScrolled ? "max-w-4xl px-2" : "max-w-6xl px-4"
-        } py-2 left-1/2 transform -translate-x-1/2`}
+  {/* Nav Items - Center */}
+  <div className="hidden md:flex flex-1 justify-center space-x-6 text-sm font-medium text-muted-foreground">
+    {navItems.map(item => (
+      <a
+        key={item.id}
+        className="px-2 py-1 text-muted-foreground hover:text-primary cursor-pointer"
+        onClick={() => scrollToSection(item.id)}
       >
-        <a className="z-50 flex items-center justify-center gap-2" href="#">
-          <div className="text-primary font-bold text-2xl neon-text">NEXURA</div>
-        </a>
-        <div className="absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-muted-foreground md:flex md:space-x-2">
-          {navItems.map(item => (
-            <a
-              key={item.id}
-              className="relative px-4 py-2 text-muted-foreground hover:text-primary cursor-pointer"
-              onClick={() => scrollToSection(item.id)}
-            >
-              {item.name}
-            </a>
-          ))}
-        </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => scrollToSection("contact")}
-            className="rounded-md font-bold bg-gradient-to-r from-primary to-accent text-black neon-glow px-4 py-2 text-sm hover:-translate-y-0.5 transition"
-          >
-            Contact Us
-          </button>
-        </div>
-      </header>
+        {item.name}
+      </a>
+    ))}
+  </div>
+
+  {/* Contact Us - Right */}
+  <div className="flex items-center">
+    <button
+      onClick={() => scrollToSection("contact")}
+      className="rounded-md font-bold bg-gradient-to-r from-primary to-accent text-black neon-glow px-4 py-2 text-sm hover:-translate-y-0.5 transition"
+    >
+      Contact Us
+    </button>
+  </div>
+</header>
+
 
       {/* Mobile Header */}
       <header className="fixed top-4 z-[99999] left-4 right-4 flex items-center justify-between md:hidden px-4 py-3 bg-background/80 backdrop-blur-sm neon-border shadow-lg rounded-full">
