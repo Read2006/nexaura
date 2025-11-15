@@ -13,6 +13,7 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isGptOpen, setIsGptOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.remove("light", "system");
@@ -41,20 +42,38 @@ export default function Home() {
   };
 
   const sendMessage = async () => {
-    const input = (document.getElementById("nexura-gpt-input") as HTMLInputElement).value;
-    if (!input) return;
+    const input = (document.getElementById("nexura-gpt-input") as HTMLInputElement)?.value;
+    if (!input || isLoading) return;
 
     setMessages(prev => [...prev, { role: "user", content: input }]);
     (document.getElementById("nexura-gpt-input") as HTMLInputElement).value = "";
+    setIsLoading(true);
 
-    const res = await fetch("/api/gpt", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: input }),
-    });
+    try {
+      const res = await fetch("/api/gpt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: input }),
+      });
 
-    const data = await res.json();
-    setMessages(prev => [...prev, { role: "assistant", content: data.result }]);
+      if (!res.ok) {
+        throw new Error("Failed to fetch response");
+      }
+
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: "assistant", content: data.result || "No response" }]);
+    } catch (error) {
+      console.error("Error:", error);
+      setMessages(prev => [...prev, { role: "assistant", content: "Sorry, I encountered an error. Please try again!" }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !isLoading) {
+      sendMessage();
+    }
   };
 
   return (
@@ -175,22 +194,53 @@ export default function Home() {
               ✖
             </button>
           </div>
-          <div id="nexura-gpt-messages" className="flex-1 p-3 overflow-y-auto text-white">
+          <div id="nexura-gpt-messages" className="flex-1 p-3 overflow-y-auto text-white space-y-3">
+            {messages.length === 0 && (
+              <div className="text-gray-400 text-center mt-4">
+                👋 Hi! I'm Nexura GPT. Ask me anything about IT, e-commerce, or our services!
+              </div>
+            )}
             {messages.map((m, i) => (
-              <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
-                {m.content}
+              <div 
+                key={i} 
+                className={`p-3 rounded-lg ${
+                  m.role === "user" 
+                    ? "bg-blue-600 ml-8 text-right" 
+                    : "bg-gray-700 mr-8 text-left"
+                }`}
+              >
+                <div className="text-sm font-semibold mb-1">
+                  {m.role === "user" ? "You" : "Nexura GPT"}
+                </div>
+                <div className="whitespace-pre-wrap">{m.content}</div>
               </div>
             ))}
+            {isLoading && (
+              <div className="bg-gray-700 mr-8 text-left p-3 rounded-lg">
+                <div className="text-sm font-semibold mb-1">Nexura GPT</div>
+                <div className="flex gap-1">
+                  <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></span>
+                  <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: "0.1s"}}></span>
+                  <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: "0.2s"}}></span>
+                </div>
+              </div>
+            )}
           </div>
           <div className="flex p-3 gap-2">
             <input
               id="nexura-gpt-input"
               type="text"
               placeholder="Type your question..."
-              className="flex-1 p-2 rounded-lg bg-gray-900 text-white outline-none"
+              onKeyPress={handleKeyPress}
+              disabled={isLoading}
+              className="flex-1 p-2 rounded-lg bg-gray-900 text-white outline-none disabled:opacity-50"
             />
-            <button onClick={sendMessage} className="bg-cyan-400 px-4 py-2 rounded-lg font-bold text-black">
-              Send
+            <button 
+              onClick={sendMessage} 
+              disabled={isLoading}
+              className="bg-cyan-400 px-4 py-2 rounded-lg font-bold text-black hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? "..." : "Send"}
             </button>
           </div>
         </div>
@@ -203,14 +253,17 @@ export default function Home() {
       <div id="contact"><Contact /></div>
 
      {/* WhatsApp – hide when GPT is open */}
-{!isGptOpen && (
-  <div className="fixed bottom-6 right-6 z-[9999]">
-    <Link
-      href="https://wa.me/13862910027?text=Hello%20I%20want%20to%20know%20more%20about%20your%20marketplace%20services!"
-      target="_blank"
-      className="group bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center hover:scale-110 animate-pulse"
-    >
-      <FaWhatsapp className="text-white text-2xl group-hover:scale-110 transition-transform duration-300" />
-    </Link>
-  </div>
-)}
+      {!isGptOpen && (
+        <div className="fixed bottom-6 right-6 z-[9999]">
+          <Link
+            href="https://wa.me/13862910027?text=Hello%20I%20want%20to%20know%20more%20about%20your%20marketplace%20services!"
+            target="_blank"
+            className="group bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center hover:scale-110 animate-pulse"
+          >
+            <FaWhatsapp className="text-white text-2xl group-hover:scale-110 transition-transform duration-300" />
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
