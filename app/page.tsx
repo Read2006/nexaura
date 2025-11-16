@@ -205,14 +205,14 @@ export default function Home() {
                 key={i} 
                 className={`p-3 rounded-lg ${
                   m.role === "user" 
-                    ? "bg-blue-600 ml-8 text-right" 
-                    : "bg-gray-700 mr-8 text-left"
+                    ? "bg-gradient-to-r from-cyan-600/80 to-blue-600/80 ml-8 text-right border border-cyan-400/30" 
+                    : "bg-gray-800/90 mr-8 text-left border border-gray-600/30"
                 }`}
               >
-                <div className="text-sm font-semibold mb-1">
+                <div className="text-sm font-semibold mb-1 text-cyan-300">
                   {m.role === "user" ? "You" : "Nexura GPT"}
                 </div>
-                <div className="whitespace-pre-wrap">{m.content}</div>
+                <div className="whitespace-pre-wrap text-white">{m.content}</div>
               </div>
             ))}
             {isLoading && (
