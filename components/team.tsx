@@ -15,13 +15,13 @@ export default function Team() {
     {
       name: "Dr Jawad Hashmi",
       role: "Co-Founder",
-      image: "/jh.jpeg",
+      image: "/avatar-placeholder.svg",
       
     },
     {
       name: "Ammar",
       role: "Co-Founder ",
-      image: "/ai-engineer-headshot.png",
+      image: "/avatar-placeholder.svg",
     },
     {      
       name: "Ihsanullah",
