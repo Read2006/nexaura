@@ -166,7 +166,7 @@ export default function Home() {
           {navItems.map((item) => (
             <a
               key={item.id}
-              className="relative px-4 py-2 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              className="px-8 py-3 rounded-full bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 text-black font-extrabold text-lg shadow-neon animate-bounce hover:scale-105 hover:shadow-neon-lg transition-all duration-300 flex items-center gap-2"
               onClick={(e) => {
                 e.preventDefault();
                 const element = document.getElementById(item.id);
