@@ -15,15 +15,14 @@ export default function Team() {
     {
       name: "Dr Jawad Hashmi",
       role: "Co-Founder",
-      image: "/avatar-placeholder.svg",
-      
+      image: "/j11.jpg",
     },
     {
       name: "Ammar",
       role: "Co-Founder ",
-      image: "/avatar-placeholder.svg",
+      image: "/a111.jpg",
     },
-    {      
+    {
       name: "Ihsanullah",
       role: "Director Ecommerce",
       image: "/ihsan.jpeg",
@@ -111,12 +110,15 @@ type AvatarProps = { src?: string; alt: string };
 
 function TeamAvatar({ src, alt }: AvatarProps) {
   const placeholder = "/avatar-placeholder.svg";
+  const isAmmar = alt === "Ammar";
 
   return (
     <img
       src={src || placeholder}
       alt={alt}
-      className="w-40 h-40 md:w-44 md:h-44 rounded-full object-cover shadow-lg"
+      className={`w-40 h-40 md:w-44 md:h-44 rounded-full object-cover shadow-lg ${
+        isAmmar ? "object-[center_25%]" : ""
+      }`}
       onError={(e) => {
         const img = e.currentTarget as HTMLImageElement;
         if (img.src !== window.location.origin + placeholder) {
